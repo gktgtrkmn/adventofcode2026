@@ -1,28 +1,24 @@
-import Text.Read (readMaybe)
-import Control.Applicative (liftA2)
+import Text.XHtml (base)
+parse :: String -> Int
+parse ('L':xs) = -(read xs)
+parse ('R':xs) = read xs
 
-parse :: String -> Maybe Int
-parse ('L':xs) = fmap negate (readMaybe xs)
-parse ('R':xs) = readMaybe xs
-parse _ = Nothing
-
-parseAll :: [String] -> [Maybe Int]
+parseAll :: [String] -> [Int]
 parseAll = map parse
 
-process :: Maybe Int -> [Maybe Int] -> [Maybe Int]
-process init list = tail (scanl (liftA2 addMod) init list)
+ch :: Int -> Bool
+ch = (==) 0 . (`mod` 100)
 
-addMod :: Int -> Int -> Int
-addMod x y = (x + y) `mod` 100
-
-countZeros :: [Maybe Int] -> Int
-countZeros list = length (filter (== Just 0) list)
+-- taken from net (AoC subreddit)
+timePasses :: Int -> Int -> Int
+timePasses a b = length $ filter ch (if a < b then [(a+1) .. b] else [(a-1), (a-2) .. b])
 
 main :: IO ()
 main = do
     content <- readFile "input.txt"
     let fileLines = lines content
     let inputs = parseAll fileLines
-    let startValue = Just 50
-    let result = countZeros (process startValue inputs)
-    print result
+    let startValue = 50
+    let abspos = scanl (+) startValue inputs
+    let part2 = sum $ zipWith timePasses abspos (tail abspos)
+    print part2
