@@ -1,4 +1,5 @@
 use std::fs;
+use fancy_regex::Regex;
 
 #[derive(Debug,Clone)]
 struct Range {
@@ -6,7 +7,7 @@ struct Range {
     to: u64
 }
 
-fn parse(input: String) -> Vec<Range> {
+fn parse(input: &String) -> Vec<Range> {
     let ranges: Vec<Range> = input
         .trim()
         .split(',')
@@ -46,7 +47,7 @@ fn split_by_magnitude(range: Range) -> Vec<Range> {
     result
 }
 
-fn part1(input: String) -> u64 {
+fn part1(input: &String) -> u64 {
     let ranges: Vec<Range> = parse(input);
     let mut found: Vec<u64> = Vec::new();
     for range in ranges {
@@ -73,8 +74,24 @@ fn part1(input: String) -> u64 {
     found.iter().sum()
 } 
 
+// not efficient -- just used to learn backreferences
+fn part2(input: &String) -> u64 {
+    let ranges: Vec<Range> = parse(input);
+    let mut found: Vec<u64> = Vec::new();
+    let re = Regex::new(r"^(\d+)\1+$").unwrap();
+    for range in ranges {
+        for i in range.from..=range.to {
+            if re.is_match(&i.to_string()).unwrap() {
+                found.push(i);
+            }
+        }
+    }
+    found.iter().sum()
+}
+
 fn main() {
-    let input_raw = fs::read_to_string("input.txt").expect("could not read");
-    let result: u64 = part1(input_raw);
-    println!("{}", result);    
+    let input_raw: String = fs::read_to_string("input.txt").expect("could not read");
+    let result1: u64 = part1(&input_raw);
+    let result2: u64 = part2(&input_raw);
+    println!("{}\n{}", result1, result2);    
 }
