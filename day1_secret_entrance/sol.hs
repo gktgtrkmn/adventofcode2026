@@ -1,5 +1,5 @@
 parse :: String -> Int
-"parse ('L':xs) = -(read xs)
+parse ('L':xs) = -(read xs)
 parse ('R':xs) = read xs
 
 parseAll :: [String] -> [Int]
